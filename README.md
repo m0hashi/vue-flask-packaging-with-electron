@@ -111,7 +111,7 @@ electron-builder のインストールで追加された/client/src/background.j
 ```js
 //...色々なデフォルトの設定
 let pyProc = null;
-
+const appEnv = require('./env.json')
 const createPyProc = () => {
   let script = appEnv.SERVER_APP_PATH
   console.log("createing on ", script);

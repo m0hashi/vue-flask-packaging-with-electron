@@ -75,7 +75,6 @@ app.on('ready', async () => {
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
-  console.log('dev')
   if (process.platform === 'win32') {
     process.on('message', data => {
       if (data === 'graceful-exit') {
@@ -91,14 +90,11 @@ if (isDevelopment) {
 
 
 try{
-if (require('fs').existsSync('./env.json')){
-
+  console.log(process.env.PWD)
   let pyProc = null;
-  const appEnv = require('./env.json')
-  const path = require('path')
 
   const createPyProc = () => {
-    let script = appEnv.SERVER_APP_PATH
+    let script = process.env.MY_PYTHON_APP_PATH
     console.log("createing at ", script);
     pyProc = require("child_process").spawn(script, { detached: true });
     if (pyProc != null) {
@@ -115,7 +111,6 @@ if (require('fs').existsSync('./env.json')){
 
     app.on("ready", createPyProc);
     app.on("will-quit", exitPyProc);
-}
 }catch(err){
-
+  console.log("PYTHON_APP_PATHが設定されていまっせん。対象のアプリのパスを設定してください。")
 }

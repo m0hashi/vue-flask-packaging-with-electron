@@ -55,10 +55,29 @@ cd cliend
 npm run electron:serve
 ```
 
+electronの子プロセスとしてサーバを起動できるように設定(サーバの手動での起動不要)
+```sh
+cd server
+pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
+export PYTHON_APP_PATH=`readlink -f ./dist/app`
+cd ../client
+npm run electron:serve 
+```
+
+ビルドして実行
+```sh
+cd server
+pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
+export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
+cd ../client
+npm run electron:build
+./dist_electron/client-0.1.0.AppImag
+```
+
 # Electron 化手順
 
-上記の動作確認ができた後、Electron で実行ファイルを 1 つにまとめます。
-Flask サーバ側のアプリを 1 つの実行ファイルにまとめ、クライアント起動時にその Flask サーバを子プロセスとして立ち上げる方針でパッケージングを行います。
+Vue+pythonで作成したアプリを後からElectron化する手順を記載します。
+ますFlask サーバ側のアプリを 1 つの実行ファイルにまとめ、クライアント起動時にその Flask サーバを子プロセスとして立ち上げる方針でパッケージングを行います。
 
 ## 環境構築
 
@@ -93,8 +112,8 @@ npm install electron-builderとすると、Electron本体が入らなかった�
 ```sh
 cd server
 source ./venv/bin/activate
-pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
-echo {\"SERVER_APP_PATH\":\"`readlink -f dist/app`\"} > ../client/src/env.json 
+pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn
+export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
 cd ..
 ```
 
@@ -110,25 +129,31 @@ electron-builder のインストールで追加された/client/src/background.j
 
 ```js
 //...色々なデフォルトの設定
-let pyProc = null;
-const appEnv = require('./env.json')
-const createPyProc = () => {
-  let script = appEnv.SERVER_APP_PATH
-  console.log("createing on ", script);
-  pyProc = require("child_process").spawn(script, { detached: true });
-  if (pyProc != null) {
-    console.log("child process spawned");
-  }
-};
+try{
+  console.log(process.env.PWD)
+  let pyProc = null;
 
-const exitPyProc = () => {
-  process.kill(-pyProc.pid);
-  console.log("child process killed");
-  pyProc = null;
-};
+  const createPyProc = () => {
+    let script = process.env.MY_PYTHON_APP_PATH
+    console.log("createing at ", script);
+    pyProc = require("child_process").spawn(script, { detached: true });
+    if (pyProc != null) {
+      console.log("child process spawned");
+    }
+  };
 
-app.on("ready", createPyProc);
-app.on("will-quit", exitPyProc);
+  const exitPyProc = () => {
+    // pyProc.kill()
+    process.kill(-pyProc.pid);
+    console.log("child process killed");
+    pyProc = null;
+  };
+
+    app.on("ready", createPyProc);
+    app.on("will-quit", exitPyProc);
+}catch(err){
+  console.log("PYTHON_APP_PATHが設定されていまっせん。対象のアプリのパスを設定してください。")
+}
 ```
 
 参考
@@ -138,8 +163,66 @@ Electron で子プロセスがフォークしたプロセスのキル https://az
 ### /client/src/App.vue
 
 electron のモジュールを利用する場合には、必要に応じて作成済みのコンポーネントにも手を入れます。
-今回は App.vue にファイルを開くダイアログを呼ぶモジュールを追加しています。
-（すでに追加済みです）
+今回は App.vue にファイルを開くダイアログを呼ぶモジュールを追加しています。App.vueのコメントアウトされている箇所のコメントアウトを解除して下記状態にしてください。
+
+
+```html
+<template>
+  <div id="app">
+    <h1>Electron-Vue-Python testing</h1>
+    <b-btn @click="openDialog">Select File</b-btn>
+
+    <div v-if="!Boolean(filepath)">
+      ファイルを選択してください。
+    </div>
+
+    <div v-else-if="Boolean(filepath)">
+      下記ファイルが指定されました。<br />
+      {{ filepath }}<br />
+      Get Data押下で指定したデータをサーバ側で取得し、テーブルに表示します。<br />
+      <b-btn @click="getpivot">Get Data</b-btn>
+      <b-table sticky-header="calc(100vh - 120px)" :items="pivot.data">
+      </b-table>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+const dialog = require("electron").remote.dialog;
+export default {
+  name: "app",
+  data() {
+    return {
+      pivot: [],
+      filepath: null,
+    };
+  },
+  methods: {
+    getpivot() {
+      axios
+        .post("http://localhost:5000/pivot", { filepath: this.filepath })
+        .then((res) => {
+          this.pivot = res.data;
+        });
+    },
+    openDialog() {
+      dialog
+        .showOpenDialog(null, {
+          properties: ["openFile"],
+          title: "select a text file",
+          defaultPath: ".",
+        })
+        .then((result) => {
+          this.filepath = result.filePaths;
+          console.log(result.filePaths);
+        });
+    },
+  },
+};
+</script>
+
+```
 
 ## 実行
 開発モードで実行します。
@@ -163,6 +246,8 @@ npm run electron:build
 ## その他
 ### CORS( Cross-Origin Resource Sharing)
 CORSの許可は server/app/app.py 内の下記コードで行っています。
+CORS(app)とすることで、リクエストに対するレスポンスにAccess-Control-Allow-Headers属性を付与して、異なるオリジンのリソース対するリクエストを許可します。
+developerツールのNetworksの欄でレスポンスヘッダにAccess-Control-Allow-Headersが付与されていることを確認できます。
 
 ```py
 from flask import Flask
@@ -176,4 +261,3 @@ api = Api(app)
 api.add_resource(Pivot, '/pivot')
 app.run(port=5000, debug=True)
 ```
-

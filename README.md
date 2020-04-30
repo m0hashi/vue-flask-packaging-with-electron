@@ -130,12 +130,13 @@ electron-builder のインストールで追加された/client/src/background.j
 
 ```js
 //...色々なデフォルトの設定
+if(process.env.MY_PYTHON_APP_PATH)
+{
 try{
-  console.log(process.env.PWD)
   let pyProc = null;
-
+  let script = process.env.MY_PYTHON_APP_PATH
+  
   const createPyProc = () => {
-    let script = process.env.MY_PYTHON_APP_PATH
     console.log("createing at ", script);
     pyProc = require("child_process").spawn(script, { detached: true });
     if (pyProc != null) {
@@ -154,6 +155,7 @@ try{
     app.on("will-quit", exitPyProc);
 }catch(err){
   console.log("PYTHON_APP_PATHが設定されていまっせん。対象のアプリのパスを設定してください。")
+}
 }
 ```
 

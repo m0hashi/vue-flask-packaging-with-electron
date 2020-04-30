@@ -1,32 +1,56 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <h1>Electron-Vue-Python testing</h1>
+    <b-btn @click='openDialog'>Select File</b-btn>
+
+    <div v-if="!Boolean(filepath)">
+      ファイルを選択してください。
     </div>
-    <router-view/>
+
+    <div v-else-if="Boolean(filepath)">
+      下記ファイルが指定されました。<br>
+      {{filepath}}<br>
+      Get Data押下で指定したデータをサーバ側で取得し、テーブルに表示します。<br>
+      <b-btn @click='getpivot'>Get Data</b-btn>
+      <!-- bootstrap-vue https://bootstrap-vue.org/docs/components/table -->
+       <b-table sticky-header='calc(100vh - 120px)' :items="pivot.data" >
+      </b-table>
+    </div>
+
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
 
-#nav {
-  padding: 30px;
-}
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+<script>
+import axios from 'axios'
+const dialog = require('electron').remote.dialog;
+export default {
+  name:'app',
+  data(){
+    return{
+      pivot: [],
+      filepath: null
+      }
+  },
+  methods:{
+    getpivot() {axios.post(
+      // 'http://localhost:5000/pivot/name',{name:null})
+       'http://localhost:5000/pivot',{'filepath': this.filepath})
+      .then(res =>
+      {this.pivot = res.data})
+      },
+    openDialog(){
+      dialog.showOpenDialog(null, {
+        properties: ['openFile'],
+        title: 'select a text file',
+        defaultPath: '.',
+      })
+      .then(result => {
+        this.filepath = result.filePaths
+        console.log(result.filePaths)
+      })
+    }
+  }
 }
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+</script>

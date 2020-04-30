@@ -26,7 +26,7 @@ git clone
 cd server
 pip3 install virtualenv
 virtualenv -p python3.7 .venv
-source ./venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 
 cd ../client

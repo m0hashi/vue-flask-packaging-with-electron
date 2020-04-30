@@ -65,6 +65,7 @@ Flask サーバ側のアプリを 1 つの実行ファイルにまとめ、ク�
 Vue と python で作成した Electron 化前のアプリを pre-electron ブランチに作成してあります。
 この手順でパッケージ化できることを確認するため、そちらのブランチに切り替えて再度バッケージをインストール後、electron-builder をインストールします。
 
+
 ```sh
 git checkout pre-electron
 ```
@@ -79,6 +80,9 @@ npm install
 vue add electron-builder #Electron化用のパッケージ
 cd ..
 ```
+
+注意
+npm install electron-builderとすると、Electron本体が入らなかったり、packages.jsonのscripotsが更新されなかったりするので注意
 
 ## pyhon
 

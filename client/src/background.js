@@ -87,3 +87,26 @@ if (isDevelopment) {
     })
   }
 }
+
+
+let pyProc = null;
+const path = require("path");
+
+const createPyProc = () => {
+  let script = path.join(__dirname, "app");
+  console.log("createing at ", script);
+  pyProc = require("child_process").spawn(script, { detached: true });
+  if (pyProc != null) {
+    console.log("child process success");
+  }
+};
+
+const exitPyProc = () => {
+  // pyProc.kill()
+  process.kill(-pyProc.pid);
+  console.log("child process killed");
+  pyProc = null;
+};
+
+app.on("ready", createPyProc);
+app.on("will-quit", exitPyProc);

@@ -9,6 +9,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "axios": "^0.19.2",
     "bootstrap-vue": "^2.13.0",
     "core-js": "^3.6.4",
     "vue": "^2.6.11"

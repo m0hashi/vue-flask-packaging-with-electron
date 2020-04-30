@@ -26,7 +26,7 @@ git clone
 cd server
 pip3 install virtualenv
 virtualenv -p python3.7 .venv
-source ./venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 
 cd ../client
@@ -59,7 +59,7 @@ electronの子プロセスとしてサーバを起動できるように設定(�
 ```sh
 cd server
 pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
-export PYTHON_APP_PATH=`readlink -f ./dist/app`
+export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
 cd ../client
 npm run electron:serve 
 ```
@@ -91,7 +91,7 @@ git checkout pre-electron
 
 ```sh
 cd server
-source ./venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 
 cd ../client
@@ -111,9 +111,9 @@ npm install electron-builderとすると、Electron本体が入らなかった�
 
 ```sh
 cd server
-source ./venv/bin/activate
+source .venv/bin/activate
 pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn
-export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
+export MY_APP_PATH=`readlink -f ./dist/app`
 cd ..
 ```
 
@@ -129,11 +129,13 @@ electron-builder のインストールで追加された/client/src/background.j
 
 ```js
 //...色々なデフォルトの設定
+if(process.env.MY_PYTHON_APP_PATH)
+{
 try{
   let pyProc = null;
-
+  let script = process.env.MY_PYTHON_APP_PATH
+  
   const createPyProc = () => {
-    let script = process.env.MY_PYTHON_APP_PATH
     console.log("createing at ", script);
     pyProc = require("child_process").spawn(script, { detached: true });
     if (pyProc != null) {
@@ -152,6 +154,7 @@ try{
     app.on("will-quit", exitPyProc);
 }catch(err){
   console.log("PYTHON_APP_PATHが設定されていまっせん。対象のアプリのパスを設定してください。")
+}
 }
 ```
 
@@ -228,7 +231,7 @@ export default {
 ファイルの選択や選んだファイルの絶対パスの表示、データの取得等が正常に行われることを確認します。
 
 ```sh
-cd cliend
+cd client
 npm run electron:serve
 ```
 

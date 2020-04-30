@@ -20,7 +20,7 @@
 
 <script>
 import axios from "axios";
-const dialog = require("electron").remote.dialog;
+// const dialog = require("electron").remote.dialog;
 export default {
   name: "app",
   data() {
@@ -37,18 +37,18 @@ export default {
           this.pivot = res.data;
         });
     },
-    openDialog() {
-      dialog
-        .showOpenDialog(null, {
-          properties: ["openFile"],
-          title: "select a text file",
-          defaultPath: ".",
-        })
-        .then((result) => {
-          this.filepath = result.filePaths;
-          console.log(result.filePaths);
-        });
-    },
+    // openDialog() {
+    //   dialog
+    //     .showOpenDialog(null, {
+    //       properties: ["openFile"],
+    //       title: "select a text file",
+    //       defaultPath: ".",
+    //     })
+    //     .then((result) => {
+    //       this.filepath = result.filePaths;
+    //       console.log(result.filePaths);
+    //     });
+    // },
   },
 };
 </script>

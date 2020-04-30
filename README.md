@@ -51,7 +51,7 @@ python app/app.py
 クライアントの実行
 
 ```sh
-cd cliend
+cd client
 npm run electron:serve
 ```
 
@@ -59,7 +59,7 @@ electronの子プロセスとしてサーバを起動できるように設定(�
 ```sh
 cd server
 pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
-export PYTHON_APP_PATH=`readlink -f ./dist/app`
+export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
 cd ../client
 npm run electron:serve 
 ```

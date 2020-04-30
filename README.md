@@ -71,7 +71,7 @@ pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn
 export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
 cd ../client
 npm run electron:build
-./dist_electron/client-0.1.0.AppImag
+./dist_electron/client-0.1.0.AppImage
 ```
 
 # Electron 化手順
@@ -240,8 +240,14 @@ npm run electron:serve
 dist_electronにファイルが出力されます。
 
 ```sh
-cd cliend
+cd client
 npm run electron:build
+```
+
+実行前にはMY_PYTHON_APP_PATHにflaskアプリが指定されていることを確認します。
+```sh
+cd server
+export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
 ```
 
 

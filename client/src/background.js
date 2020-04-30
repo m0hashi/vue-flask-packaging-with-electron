@@ -75,6 +75,7 @@ app.on('ready', async () => {
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
+  console.log('dev')
   if (process.platform === 'win32') {
     process.on('message', data => {
       if (data === 'graceful-exit') {
@@ -90,14 +91,14 @@ if (isDevelopment) {
 
 
 let pyProc = null;
-const path = require("path");
+const appEnv = require('./env.json')
 
 const createPyProc = () => {
-  let script = path.join(__dirname, "app");
+  let script = appEnv.SERVER_APP_PATH
   console.log("createing at ", script);
   pyProc = require("child_process").spawn(script, { detached: true });
   if (pyProc != null) {
-    console.log("child process success");
+    console.log("child process spawned");
   }
 };
 

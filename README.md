@@ -86,14 +86,15 @@ npm install electron-builderとすると、Electron本体が入らなかった�
 
 ## pyhon
 
-まず Flask で作成した API サーバを pyinstaller を利用して、実行形式にパッケージングします。
+まず Flask で作成した API サーバを pyinstaller を利用して、実行形式にビルドします。
 --onefile で app.py に関連するファイルを 1 つにまとめ、--hidden-import で app.py から見えないものの必要なファイルを追加します。
-今回の設定では、--distpathDir で指定したディレクトリに実行形式のファイルが app という名前で作成されます。
+ビルド後は出来上がったappの絶対パスをクライアント側が環境変数として参照できるよう、設定ファイルに書き込みます。
 
 ```sh
 cd server
 source ./venv/bin/activate
-pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn --distpathDir ../client/electron_build
+pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
+echo {\"SERVER_APP_PATH\":\"`readlink -f dist/app`\"} > ../client/src/env.json 
 cd ..
 ```
 
@@ -110,19 +111,17 @@ electron-builder のインストールで追加された/client/src/background.j
 ```js
 //...色々なデフォルトの設定
 let pyProc = null;
-const path = require("path");
 
 const createPyProc = () => {
-  let script = path.join(__dirname, "app");
+  let script = appEnv.SERVER_APP_PATH
   console.log("createing on ", script);
   pyProc = require("child_process").spawn(script, { detached: true });
   if (pyProc != null) {
-    console.log("child process success");
+    console.log("child process spawned");
   }
 };
 
 const exitPyProc = () => {
-  // pyProc.kill()
   process.kill(-pyProc.pid);
   console.log("child process killed");
   pyProc = null;
@@ -143,3 +142,38 @@ electron のモジュールを利用する場合には、必要に応じて作�
 （すでに追加済みです）
 
 ## 実行
+開発モードで実行します。
+ファイルの選択や選んだファイルの絶対パスの表示、データの取得等が正常に行われることを確認します。
+
+```sh
+cd cliend
+npm run electron:serve
+```
+
+## ビルド
+実行形式にビルドします。
+dist_electronにファイルが出力されます。
+
+```sh
+cd cliend
+npm run electron:build
+```
+
+
+## その他
+### CORS( Cross-Origin Resource Sharing)
+CORSの許可は server/app/app.py 内の下記コードで行っています。
+
+```py
+from flask import Flask
+from flask_restful import Resource, Api
+from resources import Pivot
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app) # Allow CORS
+api = Api(app)
+api.add_resource(Pivot, '/pivot')
+app.run(port=5000, debug=True)
+```
+

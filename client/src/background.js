@@ -90,7 +90,7 @@ if (isDevelopment) {
 }
 
 
-//動作確認用のifブロック。実際は不要
+try{
 if (require('fs').existsSync('./env.json')){
 
   let pyProc = null;
@@ -115,4 +115,7 @@ if (require('fs').existsSync('./env.json')){
 
     app.on("ready", createPyProc);
     app.on("will-quit", exitPyProc);
+}
+}catch(err){
+
 }

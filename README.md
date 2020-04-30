@@ -130,7 +130,6 @@ electron-builder のインストールで追加された/client/src/background.j
 ```js
 //...色々なデフォルトの設定
 try{
-  console.log(process.env.PWD)
   let pyProc = null;
 
   const createPyProc = () => {

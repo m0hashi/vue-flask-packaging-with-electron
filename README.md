@@ -92,7 +92,7 @@ git checkout pre-electron
 
 ```sh
 cd server
-source ./venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 
 cd ../client
@@ -112,7 +112,7 @@ npm install electron-builderとすると、Electron本体が入らなかった�
 
 ```sh
 cd server
-source ./venv/bin/activate
+source .venv/bin/activate
 pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn
 export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
 cd ..

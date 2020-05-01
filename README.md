@@ -10,6 +10,8 @@ Vue, python(Flask), Electron を利用して,ローカル環境でファイル�
 
 最終的に Electron で実行ファイルを作成して、python や nodejs の事前インストールなしにツールが使える形にします。
 
+![](./index.gif)
+
 # 動作確認
 
 前提

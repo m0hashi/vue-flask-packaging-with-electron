@@ -58,23 +58,23 @@ Electron でサーバとクライアントをビルドる前に、それぞれ�
 ローカルフィアルの絶対パスを扱う都合上、クライアント側はブラウザではなく Electron 上で実行します。
 (環境構築で electron-builder を導入することで、packages.json の scripts に electron:serve が追加されています。)
 
-サーバサイドの実行
+### サーバサイドの実行
 
 ```sh
 cd server
 python app/app.py
 ```
 
-クライアントの実行
+### クライアントの実行
 
 ```sh
 cd client
 npm run electron:serve
 ```
 
-electronの子プロセスとしてサーバを起動できるように設定(サーバの手動での起動不要)
+### electronの子プロセスとしてサーバを起動できるように設定(サーバの手動での起動不要)
 
-Linux
+#### Linux
 
 ```sh
 cd server
@@ -84,7 +84,7 @@ cd ../client
 npm run electron:serve 
 ```
 
-Windows
+#### Windows
 
 Windowsの場合はapp.exeの起動に時間がかかるため、クライアントが立ち上がってからしばらく待つ必要あり。
 
@@ -97,8 +97,9 @@ npm run electron:serve
 ```
 
 
-クライアントをビルドして実行
-Linux
+### クライアントをビルドして実行
+
+#### Linux
 
 ```sh
 cd server
@@ -109,6 +110,8 @@ npm run electron:build
 ./dist_electron/client-0.1.0.AppImage
 ```
 
+#### Windows
+
 ```sh
 cd server
 pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
@@ -117,7 +120,7 @@ cd ../client
 npm run electron:build
 .\dist_electron\win-unpacked\client.exe
 ```
-
+ビルド後にコマンドラインでなく、エクスプローラからダブルクリックして利用したい場合には、コントロールパネルから環境変数を設定し、永続化する必要がある。
 
 
 # Electron 化手順
@@ -196,8 +199,8 @@ try{
   };
 
   const exitPyProc = () => {
-    // pyProc.kill()
     process.kill(-pyProc.pid);
+    pyProc.kill()
     console.log("child process killed");
     pyProc = null;
   };

@@ -20,9 +20,10 @@ nodejs >= 12.0
 
 アプリを動作させるための python と vue, electron の環境を用意します。
 
-```sh
-git clone
+### Linux
 
+```sh
+git clone https://github.com/m0hashi/vue-flask-packaging-with-electron.git
 cd server
 pip3 install virtualenv
 virtualenv -p python3.7 .venv
@@ -30,6 +31,22 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 cd ../client
+npm install -g @vue/cli@4.3.1
+npm install
+cd ..
+```
+
+### Windows
+```sh
+powershell
+git clone https://github.com/m0hashi/vue-flask-packaging-with-electron.git
+cd server
+pip3 install virtualenv
+virtualenv -p python3.7 .venv
+source .\.venv\Scripts\activate
+pip install -r requirements.txt
+
+cd ..\client
 npm install -g @vue/cli@4.3.1
 npm install
 cd ..
@@ -56,6 +73,9 @@ npm run electron:serve
 ```
 
 electronの子プロセスとしてサーバを起動できるように設定(サーバの手動での起動不要)
+
+Linux
+
 ```sh
 cd server
 pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
@@ -64,15 +84,41 @@ cd ../client
 npm run electron:serve 
 ```
 
-ビルドして実行
+Windows
+
+Windowsの場合はapp.exeの起動に時間がかかるため、クライアントが立ち上がってからしばらく待つ必要あり。
+
+```sh
+cd server
+pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
+$Env:MY_PYTHON_APP_PATH = (Resolve-Path .\dist\app.exe)
+cd ../client
+npm run electron:serve 
+```
+
+
+クライアントをビルドして実行
+Linux
+
 ```sh
 cd server
 pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
 export MY_PYTHON_APP_PATH=`readlink -f ./dist/app`
 cd ../client
 npm run electron:build
-./dist_electron/client-0.1.0.AppImag
+./dist_electron/client-0.1.0.AppImage
 ```
+
+```sh
+cd server
+pyinstaller app/app.py --onefile --hidden-import pkg_resources.py2_warn 
+$Env:MY_PYTHON_APP_PATH = (Resolve-Path .\dist\app.exe)
+cd ../client
+npm run electron:build
+.\dist_electron\win-unpacked\client.exe
+```
+
+
 
 # Electron 化手順
 
@@ -85,9 +131,14 @@ Vue+pythonで作成したアプリを後からElectron化する手順を記載�
 Vue と python で作成した Electron 化前のアプリを pre-electron ブランチに作成してあります。
 この手順でビルドできることを確認するため、そちらのブランチに切り替えて再度バッケージをインストール後、electron-builder をインストールします。
 
-
+リモートのブランチ一覧は下記コマンドで調べることができます。
 ```sh
-git checkout pre-electron
+git branch -a
+```
+
+pre-electronブランチに切り替えます。
+```sh
+git checkout origin/pre-electron
 ```
 
 ```sh

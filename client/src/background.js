@@ -103,8 +103,8 @@ try{
   };
 
   const exitPyProc = () => {
-    // pyProc.kill()
     process.kill(-pyProc.pid);
+    pyProc.kill()
     console.log("child process killed");
     pyProc = null;
   };

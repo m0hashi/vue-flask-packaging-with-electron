@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['app/app.py'],
-             pathex=['/home/skepti/work/vue-flask-packaging/server'],
+a = Analysis(['app\\app.py'],
+             pathex=['D:\\Desktop\\work\\vue-flask-packaging-with-electron\\server'],
              binaries=[],
              datas=[],
              hiddenimports=['pkg_resources.py2_warn'],

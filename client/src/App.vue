@@ -38,6 +38,8 @@ export default {
         });
     },
     openDialog() {
+      console.log(process.env.MY_PYTHON_APP_PATH)
+      console.log(__dirname)
       dialog
         .showOpenDialog(null, {
           properties: ["openFile"],
